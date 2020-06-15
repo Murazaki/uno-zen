@@ -6,7 +6,7 @@ do ->
   window.Uno = Uno =
     version: '2.9.0'
 
-    is: (k, v) ->
+    is: (k, v = true) ->
       return app.dataset[k] is v unless Array.isArray v
       v.some (v) -> app.dataset[k] is v
 

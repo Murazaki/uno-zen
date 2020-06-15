@@ -24,9 +24,10 @@
   "dependencies": {
     "fastclick": "latest",
     "fitvids": "latest",
-    "instantclick": "latest",
+    "instantclick": "https://github.com/dieulot/instantclick.git#master",
     "pace": "latest",
-    "reading-time": "latest"
+    "reading-time": "latest",
+    "hover": "^2.3.1"
   },
   "ignore": [
     "**/.*",

@@ -45,6 +45,7 @@
   },
   "license": "MIT",
   "browserSync": {
+    "open": false,
     "files": [
       "**/*.html",
       "assets/**/*.*"

@@ -31,7 +31,8 @@ dist =
 src =
   sass:
     main     : 'assets/scss/' + dist.name + '.scss'
-    files    : ['assets/scss/**/**']
+    files    : ['assets/scss/**/**'
+                'assets/vendor/hover/scss/**/*.scss']
 
   js         :
     common   :
@@ -39,7 +40,8 @@ src =
                 'assets/js/src/main.coffee'
                 'assets/js/src/cover.coffee']
       vendor : ['assets/vendor/fastclick/lib/fastclick.js'
-                'assets/vendor/instantclick/instantclick.js'
+                'assets/vendor/instantclick/src/instantclick.js'
+                'assets/vendor/instantclick/src/loading-indicator.js'
                 'assets/vendor/pace/pace.min.js'
                 'assets/vendor/reading-time/build/readingTime.min.js']
     post     : ['assets/vendor/fitvids/jquery.fitvids.js'
@@ -47,7 +49,7 @@ src =
 
   css      :
     main   : 'assets/css/' + dist.name + '.css'
-    vendor : []
+    vendor : ['assets/vendor/vendorfake.css']
 
 banner = [ "/**"
            " * <%= pkg.name %> - <%= pkg.description %>"
@@ -61,27 +63,25 @@ banner = [ "/**"
 # -- Tasks ---------------------------------------------------------------------
 
 gulp.task 'js-common', ->
-  gulp.src src.js.common.main
+  return gulp.src src.js.common.main
   .pipe changed dist.js
   .pipe coffee().on 'error', gutil.log
-  .pipe addsrc src.js.common.vendor
+  .pipe addsrc src.js.common.vendor, { allowEmpty: true }
   .pipe concat dist.name + '.common.js'
   .pipe gulpif(isProduction, uglify())
   .pipe gulpif(isProduction, header banner, pkg: pkg)
   .pipe gulp.dest dist.js
-  return
 
 gulp.task 'js-post', ->
-  gulp.src src.js.post
+  return gulp.src src.js.post, { allowEmpty: true }
   .pipe changed dist.js
   .pipe concat dist.name + '.post.js'
   .pipe gulpif(isProduction, uglify())
   .pipe gulpif(isProduction, header banner, pkg: pkg)
   .pipe gulp.dest dist.js
-  return
 
 gulp.task 'css', ->
-  gulp.src src.css.vendor
+  return gulp.src src.css.vendor, { allowEmpty: true }
   .pipe changed dist.css
   .pipe addsrc src.sass.main
   .pipe sass().on('error', sass.logError)
@@ -91,15 +91,13 @@ gulp.task 'css', ->
   .pipe gulpif(isProduction, cssnano())
   .pipe gulpif(isProduction, header banner, pkg: pkg)
   .pipe gulp.dest dist.css
-  return
 
-gulp.task 'server', -> browserSync.init(pkg.browserSync)
+gulp.task 'server', -> return browserSync.init(pkg.browserSync)
 
-gulp.task 'js', ['js-common', 'js-post']
-gulp.task 'build', ['css', 'js']
+gulp.task 'js', gulp.series('js-common', 'js-post')
+gulp.task 'build', gulp.parallel('css', 'js')
 
-gulp.task 'default', ->
-  gulp.start ['build', 'server']
+gulp.task 'default', gulp.series('build', 'server'), ->
   gulp.watch src.sass.files, ['css', reload]
   gulp.watch src.js.common.main, ['js-common', reload]
   gulp.watch src.js.post, ['js-post', reload]

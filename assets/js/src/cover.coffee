@@ -14,8 +14,10 @@ $ ->
   $('#menu-button').click ->
     $('.cover, main, #menu-button, html').toggleClass 'expanded'
 
-  $("#{window.open_button}, #avatar-link").click (event) ->
-    if Uno.is 'page', 'home'
+  $("#{window.open_button}, .aside-link").click (event) ->
+    if (Uno.is 'page', 'home') and
+       (($('main, .cover, .links > li, html').hasClass 'expanded' ) or
+        $(this).is '#avatar-link') 
       event.preventDefault()
       location.hash = if location.hash is '' then '#open' else ''
       return $('#menu-button').trigger 'click' unless Uno.is 'device', 'desktop'
